@@ -10,11 +10,30 @@ import SignUp from './pages/SignUp';
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import ProjectDetail from './pages/ProjectDetail';
+import CreateProject from './pages/CreateProject';
+import Loans from './pages/Loans';
+import Analytics from './pages/Analytics';
+import Notifications from './pages/Notifications';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
+import Blogs from './pages/Blogs';
+import BlogDetail from './pages/BlogDetail';
+import Contact from './pages/Contact';
+import Lenders from './pages/Lenders';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import Landing from './pages/Landing';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('token');
   return token ? children : <Navigate to="/login" />;
+};
+
+// Smart home route: landing for guests, dashboard for logged-in users
+const HomeRoute = () => {
+  const token = localStorage.getItem('token');
+  return token ? <Navigate to="/dashboard" /> : <Landing />;
 };
 
 function App() {
@@ -25,6 +44,11 @@ function App() {
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/blogs" element={<Blogs />} />
+          <Route path="/blog/:id" element={<BlogDetail />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
           {/* Protected Routes */}
           <Route
@@ -51,9 +75,73 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/create-project"
+            element={
+              <ProtectedRoute>
+                <CreateProject />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/loans"
+            element={
+              <ProtectedRoute>
+                <Loans />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/analytics"
+            element={
+              <ProtectedRoute>
+                <Analytics />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <Notifications />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/:id"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/lenders"
+            element={
+              <ProtectedRoute>
+                <Lenders />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Default Route */}
-          <Route path="/" element={<Navigate to="/dashboard" />} />
+          <Route path="/" element={<HomeRoute />} />
         </Routes>
       </Router>
     </Provider>

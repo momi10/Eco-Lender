@@ -68,7 +68,7 @@ router.get('/:id', async (req, res) => {
 // Create project
 router.post('/', auth, async (req, res) => {
   try {
-    const { title, description, category, targetAmount, interestRate, duration, location, images } = req.body;
+    const { title, description, category, targetAmount, interestRate, duration, location, images, status } = req.body;
 
     const project = new Project({
       title,
@@ -79,6 +79,7 @@ router.post('/', auth, async (req, res) => {
       duration,
       location,
       images,
+      status: status || 'draft',
       owner: req.userId
     });
 

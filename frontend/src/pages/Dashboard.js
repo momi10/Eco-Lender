@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { BarChart3, TrendingUp, DollarSign, Users, Zap, Target } from 'lucide-react';
+import { BarChart3, TrendingUp, DollarSign, Users, Zap, Target, Sparkles, Leaf } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { analyticsService } from '../services/api';
+import { analyticsService, recommendationService } from '../services/api';
 
 const Dashboard = () => {
   const { user } = useSelector(state => state.auth);
   const [analytics, setAnalytics] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchAnalytics();
+    fetchRecommendations();
   }, []);
 
   const fetchAnalytics = async () => {
@@ -21,6 +24,15 @@ const Dashboard = () => {
       console.error('Error fetching analytics:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRecommendations = async () => {
+    try {
+      const response = await recommendationService.getRecommendations();
+      setRecommendations(response.data.recommendations || []);
+    } catch (error) {
+      console.error('Error fetching recommendations:', error);
     }
   };
 
@@ -88,6 +100,45 @@ const Dashboard = () => {
           </div>
         )}
 
+        {/* AI Recommendations */}
+        {recommendations.length > 0 && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <Sparkles size={20} className="text-yellow-500" /> Recommended for You
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {recommendations.slice(0, 3).map(project => {
+                const p = project._doc || project;
+                const fundingPct = ((p.fundedAmount || 0) / (p.targetAmount || 1)) * 100;
+                return (
+                  <Link key={p._id} to={`/project/${p._id}`}>
+                    <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Leaf size={14} className="text-green-600" />
+                        <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded">
+                          {p.category}
+                        </span>
+                      </div>
+                      <h3 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-1">{p.title}</h3>
+                      <p className="text-xs text-gray-600 line-clamp-2 mb-3">{p.description}</p>
+                      <div className="w-full bg-gray-200 rounded-full h-1.5 mb-1">
+                        <div
+                          className="bg-green-600 h-1.5 rounded-full"
+                          style={{ width: `${Math.min(fundingPct, 100)}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>{fundingPct.toFixed(0)}% funded</span>
+                        <span>{p.interestRate}% APY</span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Recent Activity */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Activity</h2>
@@ -100,21 +151,27 @@ const Dashboard = () => {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
-            <Target size={28} className="text-green-600 mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-1">Explore Projects</h3>
-            <p className="text-gray-600 text-sm">Find new investment opportunities</p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
-            <Users size={28} className="text-blue-600 mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-1">View Lenders</h3>
-            <p className="text-gray-600 text-sm">Connect with other investors</p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
-            <BarChart3 size={28} className="text-purple-600 mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-1">View Analytics</h3>
-            <p className="text-gray-600 text-sm">Detailed performance insights</p>
-          </div>
+          <Link to="/projects">
+            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
+              <Target size={28} className="text-green-600 mb-3" />
+              <h3 className="font-semibold text-gray-900 mb-1">Explore Projects</h3>
+              <p className="text-gray-600 text-sm">Find new investment opportunities</p>
+            </div>
+          </Link>
+          <Link to="/lenders">
+            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
+              <Users size={28} className="text-blue-600 mb-3" />
+              <h3 className="font-semibold text-gray-900 mb-1">View Lenders</h3>
+              <p className="text-gray-600 text-sm">Connect with other investors</p>
+            </div>
+          </Link>
+          <Link to="/analytics">
+            <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer">
+              <BarChart3 size={28} className="text-purple-600 mb-3" />
+              <h3 className="font-semibold text-gray-900 mb-1">View Analytics</h3>
+              <p className="text-gray-600 text-sm">Detailed performance insights</p>
+            </div>
+          </Link>
         </div>
       </div>
     </Layout>

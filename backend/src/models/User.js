@@ -115,7 +115,9 @@ const userSchema = new mongoose.Schema(
     twoFactorEnabled: {
       type: Boolean,
       default: false
-    }
+    },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date
   },
   { timestamps: true }
 );

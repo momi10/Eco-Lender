@@ -3,11 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Search, Filter, Leaf } from 'lucide-react';
 import Layout from '../components/Layout';
 import { projectService } from '../services/api';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 const Projects = () => {
+  const [searchParams] = useSearchParams();
+  const searchFromUrl = searchParams.get('search') || '';
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchText, setSearchText] = useState(searchFromUrl);
   const [filters, setFilters] = useState({
     category: '',
     status: 'active',
@@ -16,17 +19,33 @@ const Projects = () => {
 
   useEffect(() => {
     fetchProjects();
-  }, [filters]);
+  }, [filters, searchFromUrl]);
 
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const response = await projectService.getProjects(filters);
-      setProjects(response.data.projects);
+      if (searchFromUrl || searchText) {
+        const query = searchFromUrl || searchText;
+        const response = await projectService.searchProjects(query);
+        setProjects(response.data.projects || []);
+      } else {
+        const response = await projectService.getProjects(filters);
+        setProjects(response.data.projects || []);
+      }
     } catch (error) {
       console.error('Error fetching projects:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLocalSearch = () => {
+    if (searchText.trim()) {
+      projectService.searchProjects(searchText.trim()).then(res => {
+        setProjects(res.data.projects || []);
+      });
+    } else {
+      fetchProjects();
     }
   };
 

@@ -1,17 +1,48 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Menu, X, Bell, User, LogOut, Home, Leaf, DollarSign, Users } from 'lucide-react';
+import { Menu, X, Bell, User, LogOut, Home, Leaf, DollarSign, Users, Search } from 'lucide-react';
 
 const Navbar = ({ toggleSidebar }) => {
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
   const { user, isAuthenticated } = useSelector(state => state.auth);
   const { unreadCount } = useSelector(state => state.notifications);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.location.href = '/login';
+  };
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      setShowResults(false);
+      navigate(`/projects?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleSearchChange = async (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (query.trim().length >= 2) {
+      try {
+        const API = (await import('../services/api')).default;
+        const response = await API.get(`/api/projects/search/${encodeURIComponent(query.trim())}`);
+        setSearchResults(response.data.projects?.slice(0, 5) || []);
+        setShowResults(true);
+      } catch (error) {
+        setSearchResults([]);
+      }
+    } else {
+      setSearchResults([]);
+      setShowResults(false);
+    }
   };
 
   return (
@@ -33,12 +64,47 @@ const Navbar = ({ toggleSidebar }) => {
           </div>
 
           {/* Center - Search */}
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <input
-              type="search"
-              placeholder="Search projects..."
-              className="w-full px-4 py-2 rounded-lg text-gray-800 text-sm"
-            />
+          <div className="hidden md:flex flex-1 max-w-md mx-8 relative">
+            <form onSubmit={handleSearch} className="w-full">
+              <div className="relative">
+                <Search className="absolute left-3 top-2.5 text-gray-400" size={16} />
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  onBlur={() => setTimeout(() => setShowResults(false), 200)}
+                  onFocus={() => searchResults.length > 0 && setShowResults(true)}
+                  placeholder="Search projects..."
+                  className="w-full pl-9 pr-4 py-2 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
+                />
+              </div>
+            </form>
+
+            {/* Search Dropdown Results */}
+            {showResults && searchResults.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border text-gray-800 z-50 overflow-hidden">
+                {searchResults.map(project => (
+                  <Link
+                    key={project._id}
+                    to={`/project/${project._id}`}
+                    onClick={() => { setShowResults(false); setSearchQuery(''); }}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b last:border-b-0"
+                  >
+                    <Leaf size={14} className="text-green-600 flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{project.title}</p>
+                      <p className="text-xs text-gray-500">{project.category}</p>
+                    </div>
+                  </Link>
+                ))}
+                <button
+                  onClick={() => { setShowResults(false); navigate(`/projects?search=${encodeURIComponent(searchQuery)}`); }}
+                  className="w-full text-center text-sm text-green-600 font-medium py-2 hover:bg-gray-50"
+                >
+                  View all results →
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Right Side - Actions */}
@@ -111,3 +177,4 @@ const Navbar = ({ toggleSidebar }) => {
 };
 
 export default Navbar;
+

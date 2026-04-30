@@ -61,4 +61,10 @@ export const analyticsService = {
   getUserAnalytics: () => API.get('/api/analytics/user')
 };
 
+// Recommendation Services
+export const recommendationService = {
+  getRecommendations: () => API.get('/api/recommendations'),
+  getPersonalized: () => API.get('/api/recommendations/personalized')
+};
+
 export default API;

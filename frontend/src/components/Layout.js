@@ -10,7 +10,7 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
       <Navbar toggleSidebar={toggleSidebar} />
       <div className="flex">
         <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />

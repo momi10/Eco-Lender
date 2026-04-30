@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { MapPin, DollarSign, Calendar, Users, TrendingUp } from 'lucide-react';
 import Layout from '../components/Layout';
-import { projectService } from '../services/api';
+import { projectService, loanService } from '../services/api';
 
 const ProjectDetail = () => {
   const { id } = useParams();
+  const { user } = useSelector(state => state.auth);
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [investAmount, setInvestAmount] = useState('');
+  const [isInvesting, setIsInvesting] = useState(false);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     fetchProject();
@@ -21,6 +26,35 @@ const ProjectDetail = () => {
       console.error('Error fetching project:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleInvest = async () => {
+    if (!investAmount || isNaN(investAmount) || investAmount <= 0) {
+      setMessage('Please enter a valid amount.');
+      return;
+    }
+    
+    setIsInvesting(true);
+    setMessage('');
+    
+    try {
+      await loanService.createLoan({
+        borrowerId: project.owner?._id || project.owner || '',
+        projectId: project._id,
+        principalAmount: Number(investAmount),
+        interestRate: project.interestRate || 5,
+        duration: project.duration || 12
+      });
+      
+      setMessage('Investment successful!');
+      setInvestAmount('');
+      fetchProject(); // Refresh project details
+    } catch (error) {
+      console.error('Error investing:', error);
+      setMessage(error.response?.data?.message || 'Failed to process investment. Please try again.');
+    } finally {
+      setIsInvesting(false);
     }
   };
 
@@ -158,9 +192,47 @@ const ProjectDetail = () => {
                 </div>
               </div>
 
-              <button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition-colors">
-                Invest Now
-              </button>
+              {/* Investment Actions */}
+              {user?._id === project.owner?._id ? (
+                <div className="mt-6 p-4 bg-blue-50 text-blue-700 rounded-lg text-center font-medium">
+                  This is your project
+                </div>
+              ) : user?.userType === 'borrower' ? (
+                <div className="mt-6 p-4 bg-yellow-50 text-yellow-700 rounded-lg text-center text-sm font-medium">
+                  You are logged in as a borrower. Only lenders can invest in projects.
+                </div>
+              ) : (
+                <div className="mt-6 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Investment Amount ($)
+                    </label>
+                    <input
+                      type="number"
+                      min="10"
+                      max={project.targetAmount - project.fundedAmount}
+                      value={investAmount}
+                      onChange={(e) => setInvestAmount(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="Enter amount"
+                    />
+                  </div>
+                  
+                  {message && (
+                    <div className={`p-3 rounded text-sm ${message.includes('success') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                      {message}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={handleInvest}
+                    disabled={isInvesting || !investAmount || investAmount <= 0}
+                    className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-semibold py-2 rounded-lg transition-colors flex justify-center items-center"
+                  >
+                    {isInvesting ? 'Processing...' : 'Invest Now'}
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Lenders */}

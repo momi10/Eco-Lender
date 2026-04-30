@@ -21,7 +21,8 @@ const CreateProject = () => {
       country: '',
       address: ''
     },
-    images: []
+    images: [],
+    status: 'active'
   });
 
   const categories = [
@@ -59,7 +60,9 @@ const CreateProject = () => {
         ...formData,
         targetAmount: parseFloat(formData.targetAmount),
         interestRate: parseFloat(formData.interestRate),
-        duration: parseInt(formData.duration)
+        duration: parseInt(formData.duration),
+        status: formData.status,
+        images: formData.images && formData.images.length > 0 ? formData.images : ['https://images.pexels.com/photos/1072824/pexels-photo-1072824.jpeg?auto=compress&cs=tinysrgb&w=800']
       };
 
       await projectService.createProject(projectData);
@@ -138,6 +141,19 @@ const CreateProject = () => {
                 {categories.map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="active">Publish Immediately (Active)</option>
+                <option value="draft">Save as Draft</option>
               </select>
             </div>
           </div>

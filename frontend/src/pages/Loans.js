@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { DollarSign, Clock, CheckCircle, AlertCircle, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { DollarSign, Clock, CheckCircle, AlertCircle, TrendingUp, ArrowUpRight, ArrowDownRight, FileText, Award } from 'lucide-react';
 import Layout from '../components/Layout';
 import { loanService } from '../services/api';
 
@@ -44,6 +44,13 @@ const Loans = () => {
     }
   };
 
+  const downloadPdf = (loanId, type) => {
+    const token = localStorage.getItem('token');
+    const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    // Open in new tab — the backend streams the PDF directly
+    window.open(`${baseUrl}/api/loans/${loanId}/${type}?token=${token}`, '_blank');
+  };
+
   const getStatusBadge = (status) => {
     const badges = {
       active: 'bg-green-100 text-green-800',
@@ -79,8 +86,12 @@ const Loans = () => {
           <div className="bg-white rounded-lg shadow p-5 border-l-4 border-green-500">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Lent</p>
-                <p className="text-2xl font-bold text-gray-900">${cashFlowSummary.totalLent.toLocaleString()}</p>
+                <p className="text-sm text-gray-600">
+                  {user?.userType === 'lender' ? 'Total Lent' : 'Total Borrowed'}
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  ${user?.userType === 'lender' ? cashFlowSummary.totalLent.toLocaleString() : cashFlowSummary.totalBorrowed.toLocaleString()}
+                </p>
               </div>
               <ArrowUpRight size={24} className="text-green-500" />
             </div>
@@ -88,8 +99,12 @@ const Loans = () => {
           <div className="bg-white rounded-lg shadow p-5 border-l-4 border-blue-500">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Received</p>
-                <p className="text-2xl font-bold text-gray-900">${cashFlowSummary.totalReceived.toLocaleString()}</p>
+                <p className="text-sm text-gray-600">
+                  {user?.userType === 'lender' ? 'Total Received' : 'Total Paid'}
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  ${user?.userType === 'lender' ? cashFlowSummary.totalReceived.toLocaleString() : cashFlowSummary.totalPaid.toLocaleString()}
+                </p>
               </div>
               <ArrowDownRight size={24} className="text-blue-500" />
             </div>
@@ -97,8 +112,12 @@ const Loans = () => {
           <div className="bg-white rounded-lg shadow p-5 border-l-4 border-yellow-500">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Interest Earned</p>
-                <p className="text-2xl font-bold text-gray-900">${cashFlowSummary.totalInterest.toFixed(2)}</p>
+                <p className="text-sm text-gray-600">
+                  {user?.userType === 'lender' ? 'Interest Earned' : 'Interest Paid'}
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  ${cashFlowSummary.totalInterest.toFixed(2)}
+                </p>
               </div>
               <TrendingUp size={24} className="text-yellow-500" />
             </div>
@@ -106,8 +125,12 @@ const Loans = () => {
           <div className="bg-white rounded-lg shadow p-5 border-l-4 border-red-500">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Outstanding</p>
-                <p className="text-2xl font-bold text-gray-900">${cashFlowSummary.totalOwed.toLocaleString()}</p>
+                <p className="text-sm text-gray-600">
+                  {user?.userType === 'lender' ? 'Outstanding' : 'Outstanding Debt'}
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  ${cashFlowSummary.totalOwed.toLocaleString()}
+                </p>
               </div>
               <AlertCircle size={24} className="text-red-500" />
             </div>
@@ -177,14 +200,32 @@ const Loans = () => {
                     </div>
                   </div>
 
-                  {loan.status === 'active' && loan.borrower?._id === user?._id && (
-                    <button
-                      onClick={() => setPaymentModal({ open: true, loan })}
-                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg"
-                    >
-                      Make Payment
-                    </button>
-                  )}
+                  <div className="flex flex-col gap-2">
+                    {loan.status === 'active' && loan.borrower?._id === user?._id && (
+                      <button
+                        onClick={() => setPaymentModal({ open: true, loan })}
+                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg"
+                      >
+                        Make Payment
+                      </button>
+                    )}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => downloadPdf(loan._id, 'agreement')}
+                        className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-50"
+                        title="Download Loan Agreement"
+                      >
+                        <FileText size={14} /> Agreement
+                      </button>
+                      <button
+                        onClick={() => downloadPdf(loan._id, 'certificate')}
+                        className="flex items-center gap-1 px-3 py-1.5 border border-yellow-300 text-yellow-700 text-xs font-medium rounded-lg hover:bg-yellow-50"
+                        title="Download Impact Certificate"
+                      >
+                        <Award size={14} /> Certificate
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Payment History */}

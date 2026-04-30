@@ -3,8 +3,9 @@ import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
   User, Mail, Phone, MapPin, Edit3, Save, X, Camera,
-  Linkedin, Twitter, Facebook, Instagram, Shield, Award, TrendingUp
+  Shield, Award, TrendingUp, Globe
 } from 'lucide-react';
+import { FaLinkedin, FaTwitter, FaFacebook, FaInstagram } from 'react-icons/fa';
 import Layout from '../components/Layout';
 import { userService } from '../services/api';
 
@@ -224,10 +225,10 @@ const Profile = () => {
                 <div className="space-y-2">
                   {['linkedin', 'twitter', 'facebook', 'instagram'].map(platform => (
                     <div key={platform} className="flex items-center gap-2">
-                      {platform === 'linkedin' && <Linkedin size={16} className="text-blue-600" />}
-                      {platform === 'twitter' && <Twitter size={16} className="text-sky-500" />}
-                      {platform === 'facebook' && <Facebook size={16} className="text-blue-700" />}
-                      {platform === 'instagram' && <Instagram size={16} className="text-pink-600" />}
+                      {platform === 'linkedin' && <FaLinkedin size={16} className="text-blue-600" />}
+                      {platform === 'twitter' && <FaTwitter size={16} className="text-sky-500" />}
+                      {platform === 'facebook' && <FaFacebook size={16} className="text-blue-700" />}
+                      {platform === 'instagram' && <FaInstagram size={16} className="text-pink-600" />}
                       <input
                         value={editData.socialMedia?.[platform] || ''}
                         onChange={(e) => handleNestedChange('socialMedia', platform, e.target.value)}
@@ -241,22 +242,22 @@ const Profile = () => {
                 <div className="flex gap-3">
                   {profile.socialMedia?.linkedin && (
                     <a href={profile.socialMedia.linkedin} target="_blank" rel="noopener noreferrer" className="p-2 bg-blue-50 rounded-lg hover:bg-blue-100">
-                      <Linkedin size={20} className="text-blue-600" />
+                      <FaLinkedin size={20} className="text-blue-600" />
                     </a>
                   )}
                   {profile.socialMedia?.twitter && (
                     <a href={profile.socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="p-2 bg-sky-50 rounded-lg hover:bg-sky-100">
-                      <Twitter size={20} className="text-sky-500" />
+                      <FaTwitter size={20} className="text-sky-500" />
                     </a>
                   )}
                   {profile.socialMedia?.facebook && (
                     <a href={profile.socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="p-2 bg-blue-50 rounded-lg hover:bg-blue-100">
-                      <Facebook size={20} className="text-blue-700" />
+                      <FaFacebook size={20} className="text-blue-700" />
                     </a>
                   )}
                   {profile.socialMedia?.instagram && (
                     <a href={profile.socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="p-2 bg-pink-50 rounded-lg hover:bg-pink-100">
-                      <Instagram size={20} className="text-pink-600" />
+                      <FaInstagram size={20} className="text-pink-600" />
                     </a>
                   )}
                   {!profile.socialMedia?.linkedin && !profile.socialMedia?.twitter && !profile.socialMedia?.facebook && !profile.socialMedia?.instagram && (

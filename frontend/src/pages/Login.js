@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { Mail, Lock } from 'lucide-react';
 import { authService } from '../services/api';
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [credentials, setCredentials] = useState({
@@ -27,8 +29,11 @@ const Login = () => {
 
     try {
       const response = await authService.login(credentials);
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      // Update Redux store so Navbar/Sidebar reflect auth state immediately
+      dispatch({
+        type: 'AUTH_SUCCESS',
+        payload: { token: response.data.token, user: response.data.user }
+      });
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
@@ -89,7 +94,7 @@ const Login = () => {
               <input type="checkbox" className="mr-2" />
               Remember me
             </label>
-            <Link to="#" className="text-green-600 hover:text-green-700">
+            <Link to="/forgot-password" className="text-green-600 hover:text-green-700">
               Forgot password?
             </Link>
           </div>
