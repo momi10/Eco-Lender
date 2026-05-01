@@ -11,13 +11,5 @@
       "src": "/(.*)",
       "dest": "api/index.js"
     }
-  ],
-  "env": {
-    "MONGODB_URI": "@mongodb_uri",
-    "JWT_SECRET": "@jwt_secret",
-    "FRONTEND_URL": "@frontend_url",
-    "SENDGRID_API_KEY": "@sendgrid_api_key",
-    "STRIPE_SECRET_KEY": "@stripe_secret_key",
-    "NODE_ENV": "production"
-  }
+  ]
 }
