@@ -103,6 +103,8 @@ const Loans = () => {
     return acc;
   }, { totalLent: 0, totalBorrowed: 0, totalInterestEarned: 0, totalInterestPaid: 0, totalReceived: 0, totalPaid: 0, totalOwedToMe: 0, totalOwedByMe: 0 });
 
+  const displayedLoans = filter === '' ? loans.filter(loan => loan.status !== 'completed') : loans;
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -217,14 +219,13 @@ const Loans = () => {
           </div>
         </div>
 
-        {/* Loans List */}
         {loading ? (
           <div className="text-center py-12">
             <p className="text-gray-600">Loading loans...</p>
           </div>
-        ) : loans.length > 0 ? (
+        ) : displayedLoans.length > 0 ? (
           <div className="space-y-4">
-            {loans.map(loan => (
+            {displayedLoans.map(loan => (
               <div key={loan._id} className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex-1">

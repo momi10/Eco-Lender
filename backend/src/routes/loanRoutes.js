@@ -223,6 +223,13 @@ router.post('/:id/payment', auth, async (req, res) => {
       loan.cashFlow.outstandingBalance -= amount;
     }
 
+    if (loan.cashFlow.outstandingBalance <= 0) {
+      loan.status = 'completed';
+      loan.cashFlow.outstandingBalance = 0;
+    } else if (loan.status === 'pending') {
+      loan.status = 'active';
+    }
+
     await loan.save();
 
     res.json({
