@@ -59,11 +59,21 @@ const Loans = () => {
     }
   };
 
-  const downloadPdf = (loanId, type) => {
-    const token = localStorage.getItem('token');
-    const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-    // Open in new tab — the backend streams the PDF directly
-    window.open(`${baseUrl}/api/loans/${loanId}/${type}?token=${token}`, '_blank');
+  const downloadPdf = async (loanId, type) => {
+    try {
+      const response = await loanService.downloadPdf(loanId, type);
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${type}-${loanId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      alert('Failed to download PDF. Please try again.');
+    }
   };
 
   const getStatusBadge = (status) => {
@@ -252,7 +262,7 @@ const Loans = () => {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    {loan.status === 'active' && loan.borrower?._id === user?._id && (
+                    {(loan.status === 'active' || loan.status === 'pending') && (
                       <button
                         onClick={() => setPaymentModal({ open: true, loan })}
                         className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg"

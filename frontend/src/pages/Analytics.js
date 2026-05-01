@@ -38,14 +38,21 @@ const Analytics = () => {
     { name: 'No Investments', value: 100 }
   ];
 
-  const creditHistory = [
-    { month: 'Jan', score: 620 },
-    { month: 'Feb', score: 635 },
-    { month: 'Mar', score: 650 },
-    { month: 'Apr', score: 670 },
-    { month: 'May', score: 690 },
-    { month: 'Jun', score: analytics?.creditScore || 700 }
-  ];
+  const currentScore = analytics?.creditScore || 700;
+  const creditHistory = (() => {
+    const months = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      const m = d.toLocaleString('en-US', { month: 'short' });
+      // Simulate gradual growth toward current score
+      const variance = Math.round((5 - i) * (currentScore * 0.01));
+      months.push({ month: m, score: Math.max(300, currentScore - (5 - i) * 12 + variance) });
+    }
+    // Last month is always the actual score
+    months[months.length - 1].score = currentScore;
+    return months;
+  })();
 
   if (loading) {
     return (

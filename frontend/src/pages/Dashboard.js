@@ -3,17 +3,19 @@ import { useSelector, useDispatch } from 'react-redux';
 import { BarChart3, TrendingUp, DollarSign, Users, Zap, Target, Sparkles, Leaf } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { analyticsService, recommendationService } from '../services/api';
+import { analyticsService, recommendationService, loanService } from '../services/api';
 
 const Dashboard = () => {
   const { user } = useSelector(state => state.auth);
   const [analytics, setAnalytics] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
+  const [recentLoans, setRecentLoans] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchAnalytics();
     fetchRecommendations();
+    fetchRecentActivity();
   }, []);
 
   const fetchAnalytics = async () => {
@@ -33,6 +35,15 @@ const Dashboard = () => {
       setRecommendations(response.data.recommendations || []);
     } catch (error) {
       console.error('Error fetching recommendations:', error);
+    }
+  };
+
+  const fetchRecentActivity = async () => {
+    try {
+      const response = await loanService.getLoans({ limit: 5 });
+      setRecentLoans(response.data.loans || []);
+    } catch (error) {
+      console.error('Error fetching recent activity:', error);
     }
   };
 
@@ -142,10 +153,43 @@ const Dashboard = () => {
         {/* Recent Activity */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Activity</h2>
-          <div className="space-y-4">
-            <p className="text-gray-600 text-center py-8">
-              No recent activity yet. Start exploring projects!
-            </p>
+          <div className="space-y-3">
+            {recentLoans.length > 0 ? (
+              recentLoans.map(loan => (
+                <div key={loan._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-2 h-2 rounded-full ${
+                      loan.status === 'active' ? 'bg-green-500' :
+                      loan.status === 'completed' ? 'bg-blue-500' :
+                      loan.status === 'pending' ? 'bg-yellow-500' : 'bg-gray-400'
+                    }`} />
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {loan.lender?._id === user?._id ? 'Invested in' : 'Received from'}{' '}
+                        <span className="text-green-600">{loan.project?.title || 'a project'}</span>
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(loan.createdAt).toLocaleDateString()} · {loan.loanId}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-gray-900">${loan.principalAmount?.toLocaleString()}</p>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                      loan.status === 'active' ? 'bg-green-100 text-green-700' :
+                      loan.status === 'completed' ? 'bg-blue-100 text-blue-700' :
+                      loan.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {loan.status}
+                    </span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-600 text-center py-8">
+                No recent activity yet. Start exploring projects!
+              </p>
+            )}
           </div>
         </div>
 

@@ -48,12 +48,19 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/blog/:id" element={<BlogDetail />} />
-          <Route path="/create-blog" element={<CreateBlog />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
 
           {/* Protected Routes */}
+          <Route
+            path="/create-blog"
+            element={
+              <ProtectedRoute>
+                <CreateBlog />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/dashboard"
             element={

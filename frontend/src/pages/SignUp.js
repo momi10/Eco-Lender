@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { Mail, Lock, User, Phone } from 'lucide-react';
 import { authService } from '../services/api';
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
@@ -46,8 +48,11 @@ const SignUp = () => {
         userType: formData.userType
       });
 
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      // Update Redux store so Navbar/Sidebar reflect auth state immediately
+      dispatch({
+        type: 'AUTH_SUCCESS',
+        payload: { token: response.data.token, user: response.data.user }
+      });
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');

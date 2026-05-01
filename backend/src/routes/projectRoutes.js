@@ -38,6 +38,30 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Search projects (MUST be before /:id to avoid route conflict)
+router.get('/search/:query', async (req, res) => {
+  try {
+    const projects = await Project.find({
+      $or: [
+        { title: { $regex: req.params.query, $options: 'i' } },
+        { description: { $regex: req.params.query, $options: 'i' } },
+        { category: { $regex: req.params.query, $options: 'i' } }
+      ]
+    }).populate('owner', 'firstName lastName avatar');
+
+    res.json({
+      success: true,
+      projects
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error searching projects',
+      error: error.message
+    });
+  }
+});
+
 // Get project by ID
 router.get('/:id', async (req, res) => {
   try {
@@ -131,30 +155,6 @@ router.put('/:id', auth, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error updating project',
-      error: error.message
-    });
-  }
-});
-
-// Search projects
-router.get('/search/:query', async (req, res) => {
-  try {
-    const projects = await Project.find({
-      $or: [
-        { title: { $regex: req.params.query, $options: 'i' } },
-        { description: { $regex: req.params.query, $options: 'i' } },
-        { category: { $regex: req.params.query, $options: 'i' } }
-      ]
-    });
-
-    res.json({
-      success: true,
-      projects
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error searching projects',
       error: error.message
     });
   }

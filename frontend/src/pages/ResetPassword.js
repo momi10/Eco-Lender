@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { Lock, CheckCircle, AlertCircle } from 'lucide-react';
 import API from '../services/api';
 
 const ResetPassword = () => {
   const { token } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -41,9 +43,11 @@ const ResetPassword = () => {
         password: formData.password
       });
 
-      // Auto-login after reset
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      // Auto-login after reset via Redux
+      dispatch({
+        type: 'AUTH_SUCCESS',
+        payload: { token: response.data.token, user: response.data.user }
+      });
       setSuccess(true);
 
       setTimeout(() => navigate('/dashboard'), 2000);

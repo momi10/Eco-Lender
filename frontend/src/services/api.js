@@ -46,7 +46,8 @@ export const loanService = {
   getLoan: (loanId) => API.get(`/api/loans/${loanId}`),
   createLoan: (loanData) => API.post('/api/loans', loanData),
   cancelLoan: (loanId) => API.delete(`/api/loans/${loanId}`),
-  recordPayment: (loanId, paymentData) => API.post(`/api/loans/${loanId}/payment`, paymentData)
+  recordPayment: (loanId, paymentData) => API.post(`/api/loans/${loanId}/payment`, paymentData),
+  downloadPdf: (loanId, type) => API.get(`/api/loans/${loanId}/${type}`, { responseType: 'blob' })
 };
 
 // Notification Services
@@ -66,6 +67,18 @@ export const analyticsService = {
 export const recommendationService = {
   getRecommendations: () => API.get('/api/recommendations'),
   getPersonalized: () => API.get('/api/recommendations/personalized')
+};
+
+// Blog Services
+export const blogService = {
+  getBlogs: (params) => API.get('/api/blogs', { params }),
+  getBlog: (blogId) => API.get(`/api/blogs/${blogId}`),
+  createBlog: (blogData) => API.post('/api/blogs', blogData)
+};
+
+// Contact Services
+export const contactService = {
+  sendMessage: (contactData) => API.post('/api/contact', contactData)
 };
 
 export default API;

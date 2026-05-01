@@ -51,12 +51,14 @@ const Navbar = ({ toggleSidebar }) => {
         <div className="flex justify-between items-center h-16">
           {/* Logo and Brand */}
           <div className="flex items-center gap-3">
-            <button
-              onClick={toggleSidebar}
-              className="lg:hidden p-2 hover:bg-green-700 rounded-lg"
-            >
-              <Menu size={24} />
-            </button>
+            {isAuthenticated && (
+              <button
+                onClick={toggleSidebar}
+                className="lg:hidden p-2 hover:bg-green-700 rounded-lg"
+              >
+                <Menu size={24} />
+              </button>
+            )}
             <Link to="/" className="flex items-center gap-2 font-bold text-xl hover:text-green-100">
               <Leaf size={28} />
               Eco-Lender

@@ -1,11 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Leaf, TrendingUp, Shield, Users, BarChart3, Globe,
-  ArrowRight, DollarSign, Zap, Award, CheckCircle
+  ArrowRight, DollarSign, Zap, Award, CheckCircle, Menu, X
 } from 'lucide-react';
+import API from '../services/api';
 
 const Landing = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [stats, setStats] = useState([
+    { label: 'Projects Funded', value: '---' },
+    { label: 'Community Members', value: '---' },
+    { label: 'Total Invested', value: '---' },
+    { label: 'CO₂ Reduced', value: '---' }
+  ]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await API.get('/api/projects?limit=1');
+        const total = response.data.pagination?.total || 0;
+        setStats([
+          { label: 'Projects Listed', value: total > 0 ? `${total}+` : '0' },
+          { label: 'Community Growing', value: 'Join Us' },
+          { label: 'Eco Investments', value: 'Active' },
+          { label: 'CO₂ Impact', value: 'Measurable' }
+        ]);
+      } catch { /* keep defaults */ }
+    };
+    fetchStats();
+  }, []);
+
   const features = [
     {
       icon: Leaf,
@@ -45,13 +70,6 @@ const Landing = () => {
     }
   ];
 
-  const stats = [
-    { label: 'Projects Funded', value: '500+' },
-    { label: 'Community Members', value: '2,000+' },
-    { label: 'Total Invested', value: '$1.2M+' },
-    { label: 'CO₂ Reduced', value: '50+ tons' }
-  ];
-
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
@@ -69,6 +87,13 @@ const Landing = () => {
               <Link to="/blogs" className="hover:text-green-600 transition-colors">Blog</Link>
               <Link to="/contact" className="hover:text-green-600 transition-colors">Contact</Link>
             </div>
+            {/* Mobile menu toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 text-gray-600 hover:text-green-600"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
             <div className="flex items-center gap-3">
               <Link
                 to="/login"
@@ -85,6 +110,16 @@ const Landing = () => {
             </div>
           </div>
         </div>
+        {/* Mobile menu dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white border-t border-gray-100 px-4 py-3 space-y-2">
+            <a href="#features" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-gray-600 hover:text-green-600">Features</a>
+            <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-gray-600 hover:text-green-600">How It Works</a>
+            <a href="#impact" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-gray-600 hover:text-green-600">Impact</a>
+            <Link to="/blogs" className="block py-2 text-gray-600 hover:text-green-600">Blog</Link>
+            <Link to="/contact" className="block py-2 text-gray-600 hover:text-green-600">Contact</Link>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section */}
@@ -375,8 +410,8 @@ const Landing = () => {
             <div>
               <h4 className="text-white font-semibold mb-3">Legal</h4>
               <ul className="space-y-2 text-sm">
-                <li><span className="cursor-pointer hover:text-green-400">Privacy Policy</span></li>
-                <li><span className="cursor-pointer hover:text-green-400">Terms of Service</span></li>
+                <li><Link to="/contact" className="hover:text-green-400">Privacy Policy</Link></li>
+                <li><Link to="/contact" className="hover:text-green-400">Terms of Service</Link></li>
               </ul>
             </div>
             <div>

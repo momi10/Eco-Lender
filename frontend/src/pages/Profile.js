@@ -298,10 +298,9 @@ const Profile = () => {
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="font-semibold text-gray-900 mb-3">Verification Status</h2>
               <div className="flex items-center gap-3">
-                <div className={`w-3 h-3 rounded-full ${
-                  profile.verificationStatus === 'verified' ? 'bg-green-500' :
-                  profile.verificationStatus === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'
-                }`} />
+                <div className={`w-3 h-3 rounded-full ${profile.verificationStatus === 'verified' ? 'bg-green-500' :
+                    profile.verificationStatus === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'
+                  }`} />
                 <span className="capitalize font-medium text-gray-700">{profile.verificationStatus || 'Pending'}</span>
               </div>
             </div>

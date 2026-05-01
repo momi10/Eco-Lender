@@ -295,4 +295,38 @@ router.post(
   }
 );
 
+// Change Password (authenticated)
+router.post(
+  '/change-password',
+  auth,
+  [body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters')],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    try {
+      const { currentPassword, newPassword } = req.body;
+      const user = await User.findById(req.userId).select('+password');
+
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+      }
+
+      const isValid = await user.comparePassword(currentPassword);
+      if (!isValid) {
+        return res.status(400).json({ success: false, message: 'Current password is incorrect' });
+      }
+
+      user.password = newPassword;
+      await user.save();
+
+      res.json({ success: true, message: 'Password changed successfully' });
+    } catch (error) {
+      res.status(500).json({ success: false, message: 'Error changing password', error: error.message });
+    }
+  }
+);
+
 module.exports = router;

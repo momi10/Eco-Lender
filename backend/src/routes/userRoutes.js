@@ -98,4 +98,29 @@ router.get('/:id/stats', async (req, res) => {
   }
 });
 
+// Delete user account
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    if (req.user._id.toString() !== req.params.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to delete this account'
+      });
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+
+    res.json({
+      success: true,
+      message: 'Account deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting account',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

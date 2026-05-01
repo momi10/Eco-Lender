@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
-import API from '../services/api';
+import { blogService } from '../services/api';
 import { BookOpen, CheckCircle, AlertCircle } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
@@ -41,7 +41,7 @@ const CreateBlog = () => {
         tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
       };
       
-      await API.post('/api/blogs', payload);
+      await blogService.createBlog(payload);
       setSuccess(true);
       setTimeout(() => {
         navigate('/blogs');

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Clock, Eye, User } from 'lucide-react';
 import Layout from '../components/Layout';
-import API from '../services/api';
+import { blogService } from '../services/api';
 
 const Blogs = () => {
   const [blogs, setBlogs] = useState([]);
@@ -14,7 +14,7 @@ const Blogs = () => {
 
   const fetchBlogs = async () => {
     try {
-      const response = await API.get('/api/blogs');
+      const response = await blogService.getBlogs();
       setBlogs(response.data.blogs || []);
     } catch (error) {
       console.error('Error fetching blogs:', error);

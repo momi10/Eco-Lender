@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Clock, Eye, User, Tag } from 'lucide-react';
 import Layout from '../components/Layout';
-import API from '../services/api';
+import { blogService } from '../services/api';
 
 const BlogDetail = () => {
   const { id } = useParams();
@@ -15,7 +15,7 @@ const BlogDetail = () => {
 
   const fetchBlog = async () => {
     try {
-      const response = await API.get(`/api/blogs/${id}`);
+      const response = await blogService.getBlog(id);
       setBlog(response.data.blog);
     } catch (error) {
       console.error('Error fetching blog:', error);

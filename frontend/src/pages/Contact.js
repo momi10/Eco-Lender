@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, MessageSquare } from 'lucide-react';
 import Layout from '../components/Layout';
-import API from '../services/api';
+import { contactService } from '../services/api';
 
 const Contact = () => {
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,7 @@ const Contact = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await API.post('/api/contact', formData);
+      const response = await contactService.sendMessage(formData);
       setSuccess(response.data.message);
       setFormData({ name: '', email: '', phone: '', subject: '', message: '', category: 'general' });
     } catch (err) {

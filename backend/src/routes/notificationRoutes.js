@@ -37,6 +37,27 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+// Mark all as read (MUST be before /:id/read to avoid route conflict)
+router.put('/read-all', auth, async (req, res) => {
+  try {
+    await Notification.updateMany(
+      { userId: req.userId, isRead: false },
+      { isRead: true, readAt: new Date() }
+    );
+
+    res.json({
+      success: true,
+      message: 'All notifications marked as read'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error updating notifications',
+      error: error.message
+    });
+  }
+});
+
 // Mark notification as read
 router.put('/:id/read', auth, async (req, res) => {
   try {
@@ -54,27 +75,6 @@ router.put('/:id/read', auth, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error updating notification',
-      error: error.message
-    });
-  }
-});
-
-// Mark all as read
-router.put('/read-all', auth, async (req, res) => {
-  try {
-    await Notification.updateMany(
-      { userId: req.userId, isRead: false },
-      { isRead: true, readAt: new Date() }
-    );
-
-    res.json({
-      success: true,
-      message: 'All notifications marked as read'
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error updating notifications',
       error: error.message
     });
   }
