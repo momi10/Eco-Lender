@@ -20,6 +20,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // MongoDB Connection
 const connectDB = async () => {
+  if (mongoose.connections[0].readyState) {
+    console.log('Using existing MongoDB connection');
+    return;
+  }
   try {
     const conn = await mongoose.connect(
       process.env.MONGODB_URI || process.env.MONGODB_LOCAL,
@@ -31,7 +35,9 @@ const connectDB = async () => {
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`Error connecting to MongoDB: ${error.message}`);
-    process.exit(1);
+    if (process.env.NODE_ENV !== 'production') {
+      process.exit(1);
+    }
   }
 };
 
@@ -92,10 +98,12 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Eco-Lender server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV}`);
-});
+if (process.env.NODE_ENV !== 'production' || process.env.RUN_LOCAL === 'true') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Eco-Lender server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV}`);
+  });
+}
 
 module.exports = app;
