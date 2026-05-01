@@ -30,6 +30,8 @@ const connectDB = async () => {
       {
         useNewUrlParser: true,
         useUnifiedTopology: true,
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
       }
     );
     console.log(`MongoDB Connected: ${conn.connection.host}`);
@@ -41,7 +43,15 @@ const connectDB = async () => {
   }
 };
 
-connectDB();
+// Connect to database on first request
+let dbConnected = false;
+app.use(async (req, res, next) => {
+  if (!dbConnected) {
+    await connectDB();
+    dbConnected = true;
+  }
+  next();
+});
 
 // Import Routes
 const authRoutes = require('./src/routes/authRoutes');
