@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { Menu, X, Bell, User, LogOut, Home, Leaf, DollarSign, Users, Search } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Menu, Bell, User, LogOut, Home, Leaf, Search } from 'lucide-react';
 
 const Navbar = ({ toggleSidebar }) => {
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);

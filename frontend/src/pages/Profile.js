@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
   User, Mail, Phone, MapPin, Edit3, Save, X, Camera,
-  Shield, Award, TrendingUp, Globe
+  Shield, Award, TrendingUp
 } from 'lucide-react';
 import { FaLinkedin, FaTwitter, FaFacebook, FaInstagram } from 'react-icons/fa';
 import Layout from '../components/Layout';
@@ -22,6 +22,7 @@ const Profile = () => {
   const isOwnProfile = userId === currentUser?._id;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     if (userId) {
       fetchProfile();
       fetchStats();

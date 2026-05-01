@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { BarChart3, TrendingUp, DollarSign, Users, Zap, Target, Sparkles, Leaf } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';

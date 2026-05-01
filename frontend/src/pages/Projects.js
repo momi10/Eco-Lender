@@ -18,6 +18,7 @@ const Projects = () => {
   });
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     fetchProjects();
   }, [filters, searchFromUrl]);
 

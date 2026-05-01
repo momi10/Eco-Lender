@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Leaf, MapPin, DollarSign, Clock, Percent, ImagePlus, ArrowLeft } from 'lucide-react';
+import { Leaf, MapPin, DollarSign, ArrowLeft } from 'lucide-react';
 import Layout from '../components/Layout';
 import { projectService } from '../services/api';
 

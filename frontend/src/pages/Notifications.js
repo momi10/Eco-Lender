@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, Check, CheckCheck, Trash2, Info, AlertTriangle, DollarSign, Leaf } from 'lucide-react';
+import { Bell, Check, CheckCheck, Info, AlertTriangle, DollarSign, Leaf } from 'lucide-react';
 import Layout from '../components/Layout';
 import { notificationService } from '../services/api';
 
@@ -9,6 +9,7 @@ const Notifications = () => {
   const [filter, setFilter] = useState('all'); // all, unread, read
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     fetchNotifications();
   }, [filter]);
 

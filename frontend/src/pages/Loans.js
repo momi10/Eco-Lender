@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { DollarSign, Clock, CheckCircle, AlertCircle, TrendingUp, ArrowUpRight, ArrowDownRight, FileText, Award, XCircle } from 'lucide-react';
+import { DollarSign, Clock, AlertCircle, TrendingUp, ArrowUpRight, ArrowDownRight, FileText, Award, XCircle } from 'lucide-react';
 import Layout from '../components/Layout';
 import { loanService } from '../services/api';
 
@@ -14,6 +14,7 @@ const Loans = () => {
   const [paymentType, setPaymentType] = useState('principal');
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     fetchLoans();
   }, [filter]);
 

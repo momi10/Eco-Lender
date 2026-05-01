@@ -10,19 +10,19 @@ const BlogDetail = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchBlog();
-  }, [id]);
+    const fetchBlog = async () => {
+      try {
+        const response = await blogService.getBlog(id);
+        setBlog(response.data.blog);
+      } catch (error) {
+        console.error('Error fetching blog:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const fetchBlog = async () => {
-    try {
-      const response = await blogService.getBlog(id);
-      setBlog(response.data.blog);
-    } catch (error) {
-      console.error('Error fetching blog:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    if (id) fetchBlog();
+  }, [id]);
 
   if (loading) {
     return (

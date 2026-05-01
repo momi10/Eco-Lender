@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Clock, Eye, User } from 'lucide-react';
+import { BookOpen, Eye, User } from 'lucide-react';
 import Layout from '../components/Layout';
 import { blogService } from '../services/api';
 

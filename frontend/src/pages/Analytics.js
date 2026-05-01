@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart3, TrendingUp, DollarSign, Users, PieChart, Activity } from 'lucide-react';
+import { BarChart3, TrendingUp, DollarSign, Activity } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RePieChart, Pie, Cell, LineChart, Line, Legend } from 'recharts';
 import Layout from '../components/Layout';
 import { analyticsService } from '../services/api';

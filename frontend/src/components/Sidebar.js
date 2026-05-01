@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
   Home, Leaf, DollarSign, Users, BarChart3, Settings, LogOut,
-  ChevronRight, PlusCircle, TrendingUp, BookOpen, Mail, Bell
+  ChevronRight, PlusCircle, BookOpen, Mail, Bell
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
