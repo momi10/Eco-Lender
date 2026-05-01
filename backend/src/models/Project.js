@@ -21,7 +21,10 @@ const projectSchema = new mongoose.Schema(
         'Waste Management',
         'Education',
         'Healthcare',
-        'Community Development'
+        'Community Development',
+        'Community Garden',
+        'Clean Transportation',
+        'Eco Housing'
       ],
       required: true
     },

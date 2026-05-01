@@ -25,22 +25,17 @@ const Analytics = () => {
     }
   };
 
-  // Sample chart data (would come from real API in production)
-  const monthlyData = [
-    { month: 'Jan', lent: 1200, earned: 45 },
-    { month: 'Feb', lent: 800, earned: 52 },
-    { month: 'Mar', lent: 2000, earned: 78 },
-    { month: 'Apr', lent: 1500, earned: 95 },
-    { month: 'May', lent: 3000, earned: 120 },
-    { month: 'Jun', lent: 2200, earned: 135 }
+  const monthlyData = analytics?.monthlyData || [
+    { month: 'Jan', lent: 0, earned: 0 },
+    { month: 'Feb', lent: 0, earned: 0 },
+    { month: 'Mar', lent: 0, earned: 0 },
+    { month: 'Apr', lent: 0, earned: 0 },
+    { month: 'May', lent: 0, earned: 0 },
+    { month: 'Jun', lent: 0, earned: 0 }
   ];
 
-  const categoryData = [
-    { name: 'Solar Power', value: 35 },
-    { name: 'Urban Farming', value: 25 },
-    { name: 'Water Conservation', value: 20 },
-    { name: 'Renewable Energy', value: 12 },
-    { name: 'Waste Management', value: 8 }
+  const categoryData = analytics?.categoryData?.length > 0 ? analytics.categoryData : [
+    { name: 'No Investments', value: 100 }
   ];
 
   const creditHistory = [

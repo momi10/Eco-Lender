@@ -135,6 +135,66 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
+// Cancel a pending loan
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const loan = await Loan.findById(req.params.id);
+
+    if (!loan) {
+      return res.status(404).json({
+        success: false,
+        message: 'Loan not found'
+      });
+    }
+
+    if (loan.lender.toString() !== req.userId && loan.borrower.toString() !== req.userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to cancel this loan'
+      });
+    }
+
+    if (loan.status !== 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: 'Only pending loans can be cancelled'
+      });
+    }
+
+    // Update project funded amount
+    const project = await Project.findById(loan.project);
+    if (project) {
+      project.fundedAmount -= Number(loan.principalAmount);
+      // Remove the specific lender contribution
+      const index = project.lenders.findIndex(
+        l => l.lenderId.toString() === loan.lender.toString() && l.amount === loan.principalAmount
+      );
+      if (index > -1) {
+        project.lenders.splice(index, 1);
+      }
+      
+      if (project.status === 'funded' && project.fundedAmount < project.targetAmount) {
+        project.status = 'active';
+      }
+      
+      await project.save();
+    }
+
+    await loan.deleteOne();
+
+    res.json({
+      success: true,
+      message: 'Loan cancelled successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error cancelling loan',
+      error: error.message
+    });
+  }
+});
+
 // Record payment
 router.post('/:id/payment', auth, async (req, res) => {
   try {
@@ -156,8 +216,12 @@ router.post('/:id/payment', auth, async (req, res) => {
       status: 'completed'
     });
 
-    loan.cashFlow.totalRepaid += amount;
-    loan.cashFlow.outstandingBalance -= amount;
+    if (type === 'interest') {
+      loan.cashFlow.totalInterestPaid += amount;
+    } else {
+      loan.cashFlow.totalRepaid += amount;
+      loan.cashFlow.outstandingBalance -= amount;
+    }
 
     await loan.save();
 

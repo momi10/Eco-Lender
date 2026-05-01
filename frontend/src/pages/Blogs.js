@@ -31,6 +31,12 @@ const Blogs = () => {
             <h1 className="text-3xl font-bold text-gray-900">Eco-Lender Blog</h1>
             <p className="text-gray-600 mt-1">Insights on sustainable finance and green initiatives</p>
           </div>
+          <Link
+            to="/create-blog"
+            className="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition-colors"
+          >
+            Add Blog Post
+          </Link>
         </div>
 
         {loading ? (

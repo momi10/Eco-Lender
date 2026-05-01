@@ -45,6 +45,7 @@ export const loanService = {
   getLoans: (params) => API.get('/api/loans', { params }),
   getLoan: (loanId) => API.get(`/api/loans/${loanId}`),
   createLoan: (loanData) => API.post('/api/loans', loanData),
+  cancelLoan: (loanId) => API.delete(`/api/loans/${loanId}`),
   recordPayment: (loanId, paymentData) => API.post(`/api/loans/${loanId}/payment`, paymentData)
 };
 

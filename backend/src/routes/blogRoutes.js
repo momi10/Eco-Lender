@@ -76,7 +76,7 @@ router.post('/', auth, async (req, res) => {
       tags,
       featured_image,
       author: req.userId,
-      published: false
+      published: req.body.published !== undefined ? req.body.published : true
     });
 
     await blog.save();

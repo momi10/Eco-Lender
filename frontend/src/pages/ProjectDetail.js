@@ -197,10 +197,6 @@ const ProjectDetail = () => {
                 <div className="mt-6 p-4 bg-blue-50 text-blue-700 rounded-lg text-center font-medium">
                   This is your project
                 </div>
-              ) : user?.userType === 'borrower' ? (
-                <div className="mt-6 p-4 bg-yellow-50 text-yellow-700 rounded-lg text-center text-sm font-medium">
-                  You are logged in as a borrower. Only lenders can invest in projects.
-                </div>
               ) : (
                 <div className="mt-6 space-y-4">
                   <div>

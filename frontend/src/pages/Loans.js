@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { DollarSign, Clock, CheckCircle, AlertCircle, TrendingUp, ArrowUpRight, ArrowDownRight, FileText, Award } from 'lucide-react';
+import { DollarSign, Clock, CheckCircle, AlertCircle, TrendingUp, ArrowUpRight, ArrowDownRight, FileText, Award, XCircle } from 'lucide-react';
 import Layout from '../components/Layout';
 import { loanService } from '../services/api';
 
@@ -11,6 +11,7 @@ const Loans = () => {
   const [filter, setFilter] = useState('');
   const [paymentModal, setPaymentModal] = useState({ open: false, loan: null });
   const [paymentAmount, setPaymentAmount] = useState('');
+  const [paymentType, setPaymentType] = useState('principal');
 
   useEffect(() => {
     fetchLoans();
@@ -34,13 +35,27 @@ const Loans = () => {
     try {
       await loanService.recordPayment(loanId, {
         amount: parseFloat(paymentAmount),
-        type: 'repayment'
+        type: paymentType
       });
       setPaymentModal({ open: false, loan: null });
       setPaymentAmount('');
+      setPaymentType('principal');
       fetchLoans();
     } catch (error) {
       console.error('Error recording payment:', error);
+    }
+  };
+
+  const handleCancelLoan = async (loanId) => {
+    if (!window.confirm('Are you sure you want to cancel this pending loan? This action cannot be undone.')) {
+      return;
+    }
+    try {
+      await loanService.cancelLoan(loanId);
+      fetchLoans();
+    } catch (error) {
+      console.error('Error cancelling loan:', error);
+      alert(error.response?.data?.message || 'Error cancelling loan');
     }
   };
 
@@ -66,76 +81,112 @@ const Loans = () => {
     const isLender = loan.lender?._id === user?._id;
     if (isLender) {
       acc.totalLent += loan.principalAmount || 0;
-      acc.totalInterest += loan.cashFlow?.totalInterestPaid || 0;
+      acc.totalInterestEarned += loan.cashFlow?.totalInterestPaid || 0;
       acc.totalReceived += loan.cashFlow?.totalRepaid || 0;
+      acc.totalOwedToMe += loan.cashFlow?.outstandingBalance || 0;
     } else {
       acc.totalBorrowed += loan.principalAmount || 0;
-      acc.totalOwed += loan.cashFlow?.outstandingBalance || 0;
+      acc.totalInterestPaid += loan.cashFlow?.totalInterestPaid || 0;
       acc.totalPaid += loan.cashFlow?.totalRepaid || 0;
+      acc.totalOwedByMe += loan.cashFlow?.outstandingBalance || 0;
     }
     return acc;
-  }, { totalLent: 0, totalBorrowed: 0, totalInterest: 0, totalReceived: 0, totalOwed: 0, totalPaid: 0 });
+  }, { totalLent: 0, totalBorrowed: 0, totalInterestEarned: 0, totalInterestPaid: 0, totalReceived: 0, totalPaid: 0, totalOwedToMe: 0, totalOwedByMe: 0 });
 
   return (
     <Layout>
       <div className="space-y-6">
         <h1 className="text-3xl font-bold text-gray-900">My Loans</h1>
 
-        {/* Cash Flow Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg shadow p-5 border-l-4 border-green-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">
-                  {user?.userType === 'lender' ? 'Total Lent' : 'Total Borrowed'}
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  ${user?.userType === 'lender' ? cashFlowSummary.totalLent.toLocaleString() : cashFlowSummary.totalBorrowed.toLocaleString()}
-                </p>
+        {/* Investment Summary */}
+        {(cashFlowSummary.totalLent > 0 || user?.userType === 'lender') && (
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Investment Summary</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white rounded-lg shadow p-5 border-l-4 border-green-500">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Total Lent</p>
+                    <p className="text-2xl font-bold text-gray-900">${cashFlowSummary.totalLent.toLocaleString()}</p>
+                  </div>
+                  <ArrowUpRight size={24} className="text-green-500" />
+                </div>
               </div>
-              <ArrowUpRight size={24} className="text-green-500" />
+              <div className="bg-white rounded-lg shadow p-5 border-l-4 border-blue-500">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Total Received</p>
+                    <p className="text-2xl font-bold text-gray-900">${cashFlowSummary.totalReceived.toLocaleString()}</p>
+                  </div>
+                  <ArrowDownRight size={24} className="text-blue-500" />
+                </div>
+              </div>
+              <div className="bg-white rounded-lg shadow p-5 border-l-4 border-yellow-500">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Interest Earned</p>
+                    <p className="text-2xl font-bold text-gray-900">${cashFlowSummary.totalInterestEarned.toFixed(2)}</p>
+                  </div>
+                  <TrendingUp size={24} className="text-yellow-500" />
+                </div>
+              </div>
+              <div className="bg-white rounded-lg shadow p-5 border-l-4 border-red-500">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Outstanding Owed to You</p>
+                    <p className="text-2xl font-bold text-gray-900">${cashFlowSummary.totalOwedToMe.toLocaleString()}</p>
+                  </div>
+                  <AlertCircle size={24} className="text-red-500" />
+                </div>
+              </div>
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-5 border-l-4 border-blue-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">
-                  {user?.userType === 'lender' ? 'Total Received' : 'Total Paid'}
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  ${user?.userType === 'lender' ? cashFlowSummary.totalReceived.toLocaleString() : cashFlowSummary.totalPaid.toLocaleString()}
-                </p>
+        )}
+
+        {/* Borrowing Summary */}
+        {(cashFlowSummary.totalBorrowed > 0 || user?.userType === 'borrower') && (
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Borrowing Summary</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white rounded-lg shadow p-5 border-l-4 border-green-500">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Total Borrowed</p>
+                    <p className="text-2xl font-bold text-gray-900">${cashFlowSummary.totalBorrowed.toLocaleString()}</p>
+                  </div>
+                  <ArrowUpRight size={24} className="text-green-500" />
+                </div>
               </div>
-              <ArrowDownRight size={24} className="text-blue-500" />
+              <div className="bg-white rounded-lg shadow p-5 border-l-4 border-blue-500">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Total Paid</p>
+                    <p className="text-2xl font-bold text-gray-900">${cashFlowSummary.totalPaid.toLocaleString()}</p>
+                  </div>
+                  <ArrowDownRight size={24} className="text-blue-500" />
+                </div>
+              </div>
+              <div className="bg-white rounded-lg shadow p-5 border-l-4 border-yellow-500">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Interest Paid</p>
+                    <p className="text-2xl font-bold text-gray-900">${cashFlowSummary.totalInterestPaid.toFixed(2)}</p>
+                  </div>
+                  <TrendingUp size={24} className="text-yellow-500" />
+                </div>
+              </div>
+              <div className="bg-white rounded-lg shadow p-5 border-l-4 border-red-500">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Outstanding Debt</p>
+                    <p className="text-2xl font-bold text-gray-900">${cashFlowSummary.totalOwedByMe.toLocaleString()}</p>
+                  </div>
+                  <AlertCircle size={24} className="text-red-500" />
+                </div>
+              </div>
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-5 border-l-4 border-yellow-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">
-                  {user?.userType === 'lender' ? 'Interest Earned' : 'Interest Paid'}
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  ${cashFlowSummary.totalInterest.toFixed(2)}
-                </p>
-              </div>
-              <TrendingUp size={24} className="text-yellow-500" />
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-5 border-l-4 border-red-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">
-                  {user?.userType === 'lender' ? 'Outstanding' : 'Outstanding Debt'}
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  ${cashFlowSummary.totalOwed.toLocaleString()}
-                </p>
-              </div>
-              <AlertCircle size={24} className="text-red-500" />
-            </div>
-          </div>
-        </div>
+        )}
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4">
@@ -224,6 +275,15 @@ const Loans = () => {
                       >
                         <Award size={14} /> Certificate
                       </button>
+                      {loan.status === 'pending' && loan.lender?._id === user?._id && (
+                        <button
+                          onClick={() => handleCancelLoan(loan._id)}
+                          className="flex items-center gap-1 px-3 py-1.5 border border-red-300 text-red-700 text-xs font-medium rounded-lg hover:bg-red-50"
+                          title="Cancel Pending Loan"
+                        >
+                          <XCircle size={14} /> Cancel
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -265,6 +325,14 @@ const Loans = () => {
                   ${paymentModal.loan?.cashFlow?.outstandingBalance?.toLocaleString()}
                 </span>
               </p>
+              <select
+                value={paymentType}
+                onChange={(e) => setPaymentType(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 mb-4"
+              >
+                <option value="principal">Principal Repayment</option>
+                <option value="interest">Interest Payment</option>
+              </select>
               <input
                 type="number"
                 value={paymentAmount}

@@ -69,7 +69,7 @@ const CreateProject = () => {
       setSuccess('Project created successfully!');
       setTimeout(() => navigate('/projects'), 1500);
     } catch (err) {
-      setError(err.response?.data?.message || 'Error creating project');
+      setError(err.response?.data?.error || err.response?.data?.message || 'Error creating project');
     } finally {
       setLoading(false);
     }
