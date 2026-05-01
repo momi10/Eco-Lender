@@ -142,13 +142,13 @@ const Loans = () => {
                   <TrendingUp size={24} className="text-yellow-500" />
                 </div>
               </div>
-              <div className="bg-white rounded-lg shadow p-5 border-l-4 border-red-500">
+              <div className="bg-white rounded-lg shadow p-5 border-l-4 border-indigo-500">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">Outstanding Owed to You</p>
+                    <p className="text-sm text-gray-600">Expected Returns</p>
                     <p className="text-2xl font-bold text-gray-900">${cashFlowSummary.totalOwedToMe.toLocaleString()}</p>
                   </div>
-                  <AlertCircle size={24} className="text-red-500" />
+                  <Clock size={24} className="text-indigo-500" />
                 </div>
               </div>
             </div>
@@ -257,13 +257,15 @@ const Loans = () => {
                       <p className="font-bold text-gray-900">{loan.interestRate}%</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Outstanding</p>
-                      <p className="font-bold text-red-600">${loan.cashFlow?.outstandingBalance?.toLocaleString() || '0'}</p>
+                      <p className="text-xs text-gray-500">{loan.lender?._id === user?._id ? 'Expected Return' : 'Outstanding Debt'}</p>
+                      <p className={`font-bold ${loan.lender?._id === user?._id ? 'text-indigo-600' : 'text-red-600'}`}>
+                        ${loan.cashFlow?.outstandingBalance?.toLocaleString() || '0'}
+                      </p>
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    {(loan.status === 'active' || loan.status === 'pending') && (
+                    {(loan.status === 'active' || loan.status === 'pending') && loan.borrower?._id === user?._id && (
                       <button
                         onClick={() => setPaymentModal({ open: true, loan })}
                         className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg"

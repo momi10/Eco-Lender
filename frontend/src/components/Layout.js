@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
+import AIChatbot from './AIChatbot';
 import { notificationService } from '../services/api';
 
 const Layout = ({ children }) => {
@@ -35,10 +36,11 @@ const Layout = ({ children }) => {
       <Navbar toggleSidebar={toggleSidebar} />
       <div className="flex">
         <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-        <main className="flex-1">
+        <main className="flex-1 relative">
           <div className="max-w-7xl mx-auto p-4 lg:p-6">
             {children}
           </div>
+          <AIChatbot />
         </main>
       </div>
     </div>

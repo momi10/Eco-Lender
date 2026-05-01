@@ -122,17 +122,27 @@ const Dashboard = () => {
                 const p = project._doc || project;
                 const fundingPct = ((p.fundedAmount || 0) / (p.targetAmount || 1)) * 100;
                 return (
-                  <Link key={p._id} to={`/project/${p._id}`}>
-                    <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                      <div className="flex items-center gap-2 mb-2">
+                  <Link key={p._id} to={`/project/${p._id}`} className="block h-full">
+                    <div className="border border-purple-200 bg-gradient-to-br from-white to-purple-50 rounded-lg p-4 hover:shadow-md transition-shadow h-full flex flex-col relative overflow-hidden">
+                      <div className="absolute top-0 right-0 bg-purple-100 text-purple-700 text-[10px] font-bold px-2 py-1 rounded-bl-lg flex items-center gap-1">
+                        <Sparkles size={10} /> {p.aiMatchScore || 85}% AI Match
+                      </div>
+                      <div className="flex items-center gap-2 mb-2 mt-1">
                         <Leaf size={14} className="text-green-600" />
                         <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded">
                           {p.category}
                         </span>
                       </div>
                       <h3 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-1">{p.title}</h3>
-                      <p className="text-xs text-gray-600 line-clamp-2 mb-3">{p.description}</p>
-                      <div className="w-full bg-gray-200 rounded-full h-1.5 mb-1">
+                      <p className="text-xs text-gray-600 line-clamp-2 mb-3 flex-grow">{p.description}</p>
+                      
+                      {p.aiInsight && (
+                        <div className="mb-3 bg-white/60 p-2 rounded border border-purple-100 text-xs text-purple-800">
+                          <span className="font-semibold">AI Insight:</span> {p.aiInsight}
+                        </div>
+                      )}
+
+                      <div className="w-full bg-gray-200 rounded-full h-1.5 mb-1 mt-auto">
                         <div
                           className="bg-green-600 h-1.5 rounded-full"
                           style={{ width: `${Math.min(fundingPct, 100)}%` }}

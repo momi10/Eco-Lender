@@ -41,7 +41,22 @@ class RecommendationService {
           score += 15;
         }
 
-        return { ...project, score };
+        // Generate AI Insight based on the score components
+        let aiInsight = "A well-rounded project for your portfolio.";
+        if (user.preferences?.category && user.preferences.category.includes(project.category)) {
+          aiInsight = `Strong AI Match: Perfectly aligns with your interest in ${project.category} projects.`;
+        } else if (projectRisk === user.preferences?.riskTolerance) {
+          aiInsight = `AI Risk Analysis: Fits your ${projectRisk} risk profile perfectly.`;
+        } else if (fundingPercentage > 70) {
+          aiInsight = "AI Trend Alert: This project is trending and close to being fully funded!";
+        } else if (project.interestRate >= 5) {
+          aiInsight = "AI Yield Predictor: Identified as a high-yield opportunity.";
+        }
+
+        // Add a bit of dynamic randomness to simulate complex AI scoring weighting
+        const aiMatchScore = Math.min(99, Math.max(50, Math.floor(score * 0.6 + Math.random() * 20)));
+
+        return { ...project, score, aiMatchScore, aiInsight };
       });
 
       // Sort by score and return top N
@@ -86,7 +101,12 @@ class RecommendationService {
       const recommendedProjects = allProjects.filter(project =>
         topCategories.includes(project.category) &&
         project.status === 'active'
-      );
+      ).map(project => {
+        const doc = project._doc || project;
+        const aiMatchScore = Math.floor(80 + Math.random() * 19);
+        const aiInsight = `AI Portfolio Analysis: Recommended based on your frequent investments in ${project.category}.`;
+        return { ...doc, aiMatchScore, aiInsight };
+      });
 
       return recommendedProjects.slice(0, 5);
     } catch (error) {
