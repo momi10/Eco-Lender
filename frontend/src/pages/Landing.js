@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Leaf, TrendingUp, Shield, Users, BarChart3,
+  Leaf, TrendingUp, Shield, Users, BarChart3, Globe,
   ArrowRight, DollarSign, Zap, Menu, X
 } from 'lucide-react';
 import API from '../services/api';
