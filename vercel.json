@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "projects": [
+    {
+      "name": "eco-lender-backend",
+      "use": "@vercel/node",
+      "src": "backend"
+    },
+    {
+      "name": "eco-lender-frontend",
+      "use": "@vercel/static-build",
+      "src": "frontend"
+    }
+  ]
+}
