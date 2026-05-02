@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { MapPin, DollarSign, Calendar, Users, TrendingUp } from 'lucide-react';
+import { MapPin, Users, TrendingUp } from 'lucide-react';
 import Layout from '../components/Layout';
 import { projectService, loanService } from '../services/api';
 

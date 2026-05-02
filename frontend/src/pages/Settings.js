@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Settings as SettingsIcon, Bell, Shield, Eye, Globe, Moon, Save, X } from 'lucide-react';
+import { Bell, Shield, Eye, Moon, Save, X } from 'lucide-react';
 import Layout from '../components/Layout';
 import { userService } from '../services/api';
 import API from '../services/api';

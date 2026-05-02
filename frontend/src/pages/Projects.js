@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Search, Filter, Leaf } from 'lucide-react';
+import { Search, Leaf } from 'lucide-react';
 import Layout from '../components/Layout';
 import { projectService } from '../services/api';
 import { Link, useSearchParams } from 'react-router-dom';

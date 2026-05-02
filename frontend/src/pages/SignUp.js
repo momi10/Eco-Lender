@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { Mail, Lock, User, Phone } from 'lucide-react';
+
 import { authService } from '../services/api';
 
 const SignUp = () => {
