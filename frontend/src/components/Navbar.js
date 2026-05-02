@@ -86,29 +86,31 @@ const Navbar = ({ toggleSidebar }) => {
             {showResults && searchResults.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border text-gray-800 z-50 overflow-hidden">
                 {searchResults.map(project => (
-                  <Link
+                  <button
                     key={project._id}
-                    to={`/project/${project._id}`}
                     onMouseDown={(e) => {
                       e.preventDefault();
+                      navigate(`/project/${project._id}`);
                       setShowResults(false);
                       setSearchQuery('');
                     }}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b last:border-b-0"
+                    type="button"
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b last:border-b-0 text-left"
                   >
                     <Leaf size={14} className="text-green-600 flex-shrink-0" />
                     <div className="min-w-0">
                       <p className="text-sm font-medium truncate">{project.title}</p>
                       <p className="text-xs text-gray-500">{project.category}</p>
                     </div>
-                  </Link>
+                  </button>
                 ))}
                 <button
                   onMouseDown={(e) => {
                     e.preventDefault();
-                    setShowResults(false);
                     navigate(`/projects?search=${encodeURIComponent(searchQuery)}`);
+                    setShowResults(false);
                   }}
+                  type="button"
                   className="w-full text-center text-sm text-green-600 font-medium py-2 hover:bg-gray-50"
                 >
                   View all results →
