@@ -89,7 +89,11 @@ const Navbar = ({ toggleSidebar }) => {
                   <Link
                     key={project._id}
                     to={`/project/${project._id}`}
-                    onClick={() => { setShowResults(false); setSearchQuery(''); }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setShowResults(false);
+                      setSearchQuery('');
+                    }}
                     className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b last:border-b-0"
                   >
                     <Leaf size={14} className="text-green-600 flex-shrink-0" />
@@ -100,7 +104,11 @@ const Navbar = ({ toggleSidebar }) => {
                   </Link>
                 ))}
                 <button
-                  onClick={() => { setShowResults(false); navigate(`/projects?search=${encodeURIComponent(searchQuery)}`); }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setShowResults(false);
+                    navigate(`/projects?search=${encodeURIComponent(searchQuery)}`);
+                  }}
                   className="w-full text-center text-sm text-green-600 font-medium py-2 hover:bg-gray-50"
                 >
                   View all results →
