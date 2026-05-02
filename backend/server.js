@@ -84,6 +84,15 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Root endpoint for quick deployment checks
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    message: 'Eco-Lender backend is running',
+    health: '/api/health'
+  });
+});
+
 // 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({
