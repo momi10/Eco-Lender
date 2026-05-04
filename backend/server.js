@@ -117,7 +117,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-if (process.env.NODE_ENV !== 'production' || process.env.RUN_LOCAL === 'true') {
+if (process.env.NODE_ENV !== 'production' || process.env.RUN_LOCAL === 'true' || process.env.RENDER === 'true') {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`🚀 Eco-Lender server running on port ${PORT}`);
