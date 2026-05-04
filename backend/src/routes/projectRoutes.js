@@ -110,6 +110,29 @@ router.post('/', auth, async (req, res) => {
     await project.save();
     await project.populate('owner', 'firstName lastName avatar');
 
+    // Create notifications for other users
+    const Notification = require('../models/Notification');
+    const User = require('../models/User');
+    
+    // Find all active users except the project creator
+    const usersToNotify = await User.find({ 
+      _id: { $ne: req.userId },
+      isActive: true 
+    });
+
+    if (usersToNotify.length > 0) {
+      const notifications = usersToNotify.map(user => ({
+        userId: user._id,
+        type: 'project_update',
+        title: 'New Project Opportunity!',
+        message: `A new project "${project.title}" has just been launched in the market. Check it out!`,
+        relatedId: { projectId: project._id },
+        priority: 'medium',
+        isRead: false
+      }));
+      await Notification.insertMany(notifications);
+    }
+
     res.status(201).json({
       success: true,
       message: 'Project created successfully',

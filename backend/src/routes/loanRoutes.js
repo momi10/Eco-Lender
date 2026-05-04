@@ -120,6 +120,55 @@ router.post('/', auth, async (req, res) => {
 
     await loan.populate('lender borrower project');
 
+    // Create notifications for the investment
+    const Notification = require('../models/Notification');
+    
+    const notificationsToCreate = [];
+
+    // Notify the borrower (Project Owner)
+    notificationsToCreate.push({
+      userId: borrowerId,
+      type: 'payment_received',
+      title: 'New Investment Received!',
+      message: `Someone just invested $${principalAmount} in your project "${project.title}"!`,
+      relatedId: { projectId: project._id, loanId: loan._id },
+      priority: 'high',
+      isRead: false
+    });
+
+    // Notify the lender (Investor)
+    notificationsToCreate.push({
+      userId: req.userId,
+      type: 'loan_approved',
+      title: 'Investment Successful',
+      message: `You successfully invested $${principalAmount} in the project "${project.title}".`,
+      relatedId: { projectId: project._id, loanId: loan._id },
+      priority: 'medium',
+      isRead: false
+    });
+
+    // Optionally, notify all other users that the project got funding
+    const usersToNotify = await User.find({
+      _id: { $nin: [req.userId, borrowerId] },
+      isActive: true
+    });
+    
+    usersToNotify.forEach(user => {
+      notificationsToCreate.push({
+        userId: user._id,
+        type: 'project_update',
+        title: 'Project Funding Update',
+        message: `The project "${project.title}" just received a new investment of $${principalAmount}!`,
+        relatedId: { projectId: project._id },
+        priority: 'low',
+        isRead: false
+      });
+    });
+
+    if (notificationsToCreate.length > 0) {
+      await Notification.insertMany(notificationsToCreate);
+    }
+
     res.status(201).json({
       success: true,
       message: 'Loan created successfully',
