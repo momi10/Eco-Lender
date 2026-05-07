@@ -34,9 +34,9 @@ const Layout = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
       <Navbar toggleSidebar={toggleSidebar} />
-      <div className="flex">
+      <div className="flex items-stretch">
         <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-        <main className="flex-1 relative">
+        <main className="flex-1 relative min-h-[calc(100vh-64px)]">
           <div className="max-w-7xl mx-auto p-4 lg:p-6">
             {children}
           </div>
